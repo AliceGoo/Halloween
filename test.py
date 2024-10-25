@@ -12,7 +12,7 @@ from threading import Thread
 from PIL import ImageFont, ImageDraw, Image, ImageSequence  # For Gothic font rendering
 
 # Define the base directory where the images are stored
-base_path = '/Users/lovelyyuer/Documents/0.QuincyCollege/Fall/halloweenProject'
+base_path = os.getcwd() # get current directory path
 
 # Initialize Pygame Mixer for music playback
 mixer.init()
@@ -23,7 +23,7 @@ engine = pyttsx3.init()
 
 # Load pre-trained facial landmark detector
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor('/Users/lovelyyuer/Documents/0.QuincyCollege/Fall/halloweenProject/facial-landmarks-recognition/shape_predictor_68_face_landmarks.dat')
+predictor = dlib.shape_predictor(f'{base_path}/facial-landmarks-recognition/shape_predictor_68_face_landmarks.dat')
 
 # Define the paths to individual image files using the base path
 horns_path = os.path.join(base_path, 'horns.png')
@@ -41,7 +41,7 @@ pumpkin_img = cv2.imread(pumpkin_path, cv2.IMREAD_UNCHANGED)
 jason_img = cv2.imread(jason_path, cv2.IMREAD_UNCHANGED)
 
 # Load Gothic Font (TrueType Font)
-gothic_font_path = '/Users/lovelyyuer/Documents/0.QuincyCollege/Fall/halloweenProject//Blackletter.ttf'  # Replace with the path to your font
+gothic_font_path = f'{base_path}/Blackletter.ttf'  # Replace with the path to your font
 font = ImageFont.truetype(gothic_font_path, 70)  # Load the Gothic font with size 70
 
 # Global state variables
