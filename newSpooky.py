@@ -51,6 +51,12 @@ def get_font(frame, font_path=gothic_font_path, scale_factor=25):
     font_size = max(frame.shape[1] // scale_factor, 20)  # Adjust size dynamically
     return ImageFont.truetype(font_path, font_size)
 
+# Add "Dare to scan?" with wiggle and jump effect
+def wiggle_text_position(base_pos):
+    wiggle_x = base_pos[0] + int(5 * math.sin(time.time() * 2))
+    wiggle_y = base_pos[1] + int(5 * abs(math.sin(time.time() * 2)))
+    return wiggle_x, wiggle_y
+
 # Global state variables
 fortune_active = False
 fortune_start_time = 0
@@ -83,6 +89,10 @@ def display_spooky_messages(frame, start_time, qr_code_pinned=False):
         # top_left_position = (10, 10)
         top_right_position = (frame.shape[1] - qr_code_resized.shape[1] - 10, 10)
         frame = overlay_image_alpha(frame, qr_code_resized, top_right_position)
+    
+    # Add the animated "Dare to scan?" text below the QR code
+        wiggle_pos = wiggle_text_position((top_right_position[0], top_right_position[1] + qr_code_resized.shape[0] + 10))
+        frame = draw_gothic_text(frame, "Scan!", wiggle_pos, get_font(frame, scale_factor=30), (220, 20, 60))
     
     return frame, qr_code_pinned
 
@@ -138,18 +148,6 @@ def display_spooky_messages(frame, start_time, qr_code_pinned=False):
     
 #     return frame
 
-# # Display timed spooky message and QR code
-# def display_spooky_message(frame, start_time):
-#     elapsed_time = time.time() - start_time
-#     font = get_font(frame)
-#     if 15 < elapsed_time <= 20:
-#         frame = draw_gothic_text(frame, "Are you ready to solve some spooky riddle?", (50, 100), font, (50, 0, 0))
-#     elif 20 < elapsed_time <= 25:
-#         frame = draw_gothic_text(frame, "Scan the code to solve the riddle.", (50, 100), font)
-#         frame = overlay_image_alpha(frame, qr_code_img, ((frame.shape[1] - qr_code_img.shape[1]) // 2, frame.shape[0] // 3))
-#     elif elapsed_time > 25:
-#         frame = overlay_image_alpha(frame, qr_code_img, (10, frame.shape[0] - qr_code_img.shape[0] - 10))
-#     return frame
 
 # Pumpkin animation function for wiggle and jump
 def wiggle_pumpkin_position(base_pos, frame_width, frame_height):
@@ -455,7 +453,7 @@ def show_fortune(frame, landmarks):
     if not fortune_active:
         fortune_active = True
         fortune_start_time = time.time()
-        current_fortune_index = 0  # Reset to the first fortune
+        current_fortune_index = random.randint(0, 8)  # Reset to the first fortune
 
     # Calculate time since the start of the fortune display
     elapsed_time = time.time() - fortune_start_time
@@ -582,7 +580,7 @@ while True:
     landmarks_list = [predictor(gray, face) for face in faces]
 
     # Check if the recognized command is "fortune"
-    if recognized_command == "fortune":
+    if recognized_command == "fortune" and landmarks_list:
         frame = show_fortune(frame, landmarks_list[0])  # Apply the fortune to the first person detected
         recognized_command = None  # Reset command after showing fortune
     else:
